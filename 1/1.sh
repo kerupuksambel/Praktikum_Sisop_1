@@ -22,9 +22,49 @@ a=`awk -F ',' '
 			}
 		}
 
-		print min_val
-		print min_key
+		print min_val "|" min_key
 	}
 ' Sample-Superstore.csv`
 
-echo $a
+ans_a=`echo $a | awk '{split($0, x, "|"); print x[2]}'`
+val_a=`echo $a | awk '{split($0, x, "|"); print x[1]}'`
+
+echo "Jawaban No. 1a : $ans_a, Profit : $val_a"
+
+# b=`awk -F ',' -v var="$ans_a" '
+# 	BEGIN {
+# 		max=0
+# 	}
+
+# 	$13 == var { arr[$11] = arr[$11] + $20; max = max + 1 }
+
+# 	END {
+# 		for(key in arr){
+# 			print arr[key] "|" key
+# 		}
+# 	}
+# ' Sample-Superstore.csv > tmp`
+
+# b2=`sort -g -k1,2rn tmp > tmp2`
+# b_res=`head -n 2 tmp2`
+# `rm tmp`; `rm tmp2` 
+
+
+b=`awk -F ',' -v var="$ans_a" '
+	BEGIN {
+		max=0
+	}
+
+	$13 == var { arr[$11] = arr[$11] + $20; max = max + 1 }
+
+	END {
+		for(key in arr){
+			print arr[key] "|" key
+		}
+	}
+' Sample-Superstore.csv | sort -g -k1,2rn | head -n 2`
+
+echo "Jawaban No. 1b :"
+b_res=`echo "$b" | awk ' {split($0, x, "|"); print "- "x[2]", Profit : "x[1]}'`
+
+echo "$b_res"
